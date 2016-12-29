@@ -244,6 +244,32 @@ controller.studio.before('tacos', function(convo, next) {
 });
 ```
 
+### controller.endConversationsWithUser()
+| Argument | Description
+|---  |---
+| user_id   | The id of the current user
+
+This function will call `stop()` on any active conversations with the specified user. This is useful in `before` hooks with scripts containing questions or sections of code with `convo.ask()` functions, avoiding doubling the question.
+
+Note: conversations ended this way will call their `conversationEnded` listeners, and Botkit Studio scripts will call their `after` hooks. These functions should check the status of the conversation object, `endConversationsWithUser` will use the status `Interrupted`.
+
+```
+  controller.studio.before('my_script', function (convo, next) {
+    // If script my_script includes questions,
+    // End any outstanding questions first
+    controller.endConversationsWithUser(convo.context.user)
+  })
+
+  controller.studio.after('my_script', function (convo, next) {
+    if (convo.status === 'completed') {
+      // normal flow
+      // do something
+    }
+    else {
+      // do nothing
+    }
+  })
+```
 
 ### controller.studio.after()
 | Argument | Description
